@@ -6,6 +6,12 @@ definitions:
         example: invalid body
         type: string
     type: object
+  controller.MessageResponse:
+    properties:
+      message:
+        example: task deleted
+        type: string
+    type: object
   controller.TaskRequest:
     properties:
       description:
@@ -73,6 +79,37 @@ paths:
           schema:
             $ref: '#/definitions/controller.ErrorResponse'
       summary: Create a task
+      tags:
+      - tasks
+  /delete-task/{id}:
+    delete:
+      description: Deletes a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Delete a task
       tags:
       - tasks
   /get-tasks:
