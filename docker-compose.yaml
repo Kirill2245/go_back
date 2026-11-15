@@ -10,7 +10,7 @@ services:
       - go-mod-cache:/go/pkg/mod    # Кэш модулей
       - go-build-cache:/root/.cache/go-build # Кэш сборки
     environment:
-      DATABASE_URL: "host=db user=postgres password=mysecretpassword dbname=mydb port=5432 sslmode=disable"
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable"
     depends_on:
       db:
         condition: service_healthy
@@ -28,7 +28,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/18/docker
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
