@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    container_name: echo-app
+    ports:
+      - "8080:8080"
+    working_dir: /app
+    volumes:
+      - .:/app                      # Монтирование кода
+      - go-mod-cache:/go/pkg/mod    # Кэш модулей
+      - go-build-cache:/root/.cache/go-build # Кэш сборки
+    environment:
+      DATABASE_URL: "host=db user=postgres password=mysecretpassword dbname=mydb port=5432 sslmode=disable"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:18
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/18/docker
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  go-mod-cache:
+  go-build-cache:
