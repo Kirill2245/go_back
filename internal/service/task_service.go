@@ -18,7 +18,16 @@ type TaskService struct {
 func NewTaskService(repo repository.TaskRepository) *TaskService {
 	return &TaskService{repo: repo}
 }
-
+func (s *TaskService) taskExists(ctx context.Context, id uint) (*model.Task, error) {
+	task, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return task, nil
+}
 func (s *TaskService) CreateTask(ctx context.Context, title, description string) (*model.Task, error) {
 
 	if title == "" {
@@ -45,14 +54,13 @@ func (s *TaskService) UpdateTask(ctx context.Context, id uint, title, descriptio
 		return nil, ErrTitleRequired
 	}
 
-	task, err := s.repo.GetByID(ctx, id)
+	task, err := s.taskExists(ctx, id)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrTaskNotFound
-		}
 		return nil, err
 	}
-
+	if task == nil {
+		return nil, ErrTaskNotFound
+	}
 	task.Title = title
 	task.Description = description
 
@@ -61,4 +69,15 @@ func (s *TaskService) UpdateTask(ctx context.Context, id uint, title, descriptio
 	}
 
 	return task, nil
+}
+
+func (s *TaskService) DeleteTask(ctx context.Context, id uint) error {
+	exists, err := s.taskExists(ctx, id)
+	if err != nil {
+		return err
+	}
+	if exists == nil {
+		return ErrTaskNotFound
+	}
+	return s.repo.RemoveTask(ctx, id)
 }

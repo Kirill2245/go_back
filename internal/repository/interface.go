@@ -10,4 +10,5 @@ type TaskRepository interface {
 	GetByID(ctx context.Context, id uint) (*model.Task, error)
 	FindTasks(ctx context.Context) ([]model.Task, error)
 	UpdateTask(ctx context.Context, task *model.Task) error
+	RemoveTask(ctx context.Context, id uint) error
 }

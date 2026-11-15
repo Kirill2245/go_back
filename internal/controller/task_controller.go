@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -20,6 +21,10 @@ type TaskRequest struct {
 
 type ErrorResponse struct {
 	Error string `json:"error" example:"invalid body"`
+}
+
+type MessageResponse struct {
+	Message string `json:"message" example:"task deleted"`
 }
 
 func NewTaskController(svc *service.TaskService) *TaskController {
@@ -99,8 +104,39 @@ func (h *TaskController) UpdateTask(c *echo.Context) error {
 
 	task, err := h.svc.UpdateTask(c.Request().Context(), id, req.Title, req.Description)
 	if err != nil {
+		if errors.Is(err, service.ErrTaskNotFound) {
+			return c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
+		}
 		return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, task)
+}
+
+// DeleteTask deletes a task by ID.
+//
+//	@Summary		Delete a task
+//	@Description	Deletes a task by ID
+//	@Tags			tasks
+//	@Produce		json
+//	@Param			id	path		int	true	"Task ID"
+//	@Success		200	{object}	controller.MessageResponse
+//	@Failure		400	{object}	controller.ErrorResponse
+//	@Failure		404	{object}	controller.ErrorResponse
+//	@Failure		500	{object}	controller.ErrorResponse
+//	@Router			/delete-task/{id} [delete]
+func (h *TaskController) DeleteTask(c *echo.Context) error {
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid id"})
+	}
+
+	if err := h.svc.DeleteTask(c.Request().Context(), uint(id64)); err != nil {
+		if errors.Is(err, service.ErrTaskNotFound) {
+			return c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
+		}
+		return c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, MessageResponse{Message: "task deleted"})
 }

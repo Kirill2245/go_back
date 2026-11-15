@@ -24,4 +24,5 @@ func Register(e *echo.Echo, taskCtrl *controller.TaskController) {
 	e.POST("/create-task", taskCtrl.Create)
 	e.GET("/get-tasks", taskCtrl.GetFullTasks)
 	e.PATCH("/update/:id", taskCtrl.UpdateTask)
+	e.DELETE("/delete-task/:id", taskCtrl.DeleteTask)
 }

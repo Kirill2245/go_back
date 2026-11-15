@@ -37,3 +37,7 @@ func (r *taskRepository) UpdateTask(ctx context.Context, task *model.Task) error
 		Description: task.Description,
 	}).Error
 }
+
+func (r *taskRepository) RemoveTask(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Unscoped().Delete(&model.Task{}, id).Error
+}
