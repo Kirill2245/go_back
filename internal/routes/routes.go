@@ -9,7 +9,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-func Register(e *echo.Echo, taskCtrl *controller.TaskController) {
+func Register(e *echo.Echo, taskCtrl *controller.TaskController, smallTaskCtrl *controller.SmallTaskController) {
 	e.GET("/health", func(c *echo.Context) error {
 		return c.String(http.StatusOK, "Health - ok")
 	})
@@ -25,4 +25,9 @@ func Register(e *echo.Echo, taskCtrl *controller.TaskController) {
 	e.GET("/get-tasks", taskCtrl.GetFullTasks)
 	e.PATCH("/update/:id", taskCtrl.UpdateTask)
 	e.DELETE("/delete-task/:id", taskCtrl.DeleteTask)
+
+	e.POST("/create-small-task", smallTaskCtrl.Create)
+	e.GET("/get-small-tasks/:taskID", smallTaskCtrl.GetSmallTasks)
+	e.PATCH("/update-small-task/:id", smallTaskCtrl.UpdateSmallTask)
+	e.DELETE("/delete-small-task/:id", smallTaskCtrl.DeleteSmallTask)
 }

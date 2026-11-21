@@ -15,6 +15,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/create-small-task": {
+            "post": {
+                "description": "Creates a small task with the given title for a task",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "small-tasks"
+                ],
+                "summary": "Create a small task",
+                "parameters": [
+                    {
+                        "description": "Small task payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.SmallTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.SmallTask"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/create-task": {
             "post": {
                 "description": "Creates a task with the given title and description",
@@ -48,6 +100,53 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/delete-small-task/{id}": {
+            "delete": {
+                "description": "Deletes a small task by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "small-tasks"
+                ],
+                "summary": "Delete a small task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Small task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/controller.ErrorResponse"
                         }
@@ -108,6 +207,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/get-small-tasks/{taskID}": {
+            "get": {
+                "description": "Returns all small tasks of a task by task ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "small-tasks"
+                ],
+                "summary": "List small tasks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.SmallTask"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/get-tasks": {
             "get": {
                 "description": "Returns all tasks",
@@ -126,6 +275,65 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/model.Task"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/update-small-task/{id}": {
+            "patch": {
+                "description": "Updates the title of a small task by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "small-tasks"
+                ],
+                "summary": "Update a small task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Small task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Small task payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.SmallTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SmallTask"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ErrorResponse"
                         }
                     },
                     "500": {
@@ -216,6 +424,19 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.SmallTaskRequest": {
+            "type": "object",
+            "properties": {
+                "task_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy milk"
+                }
+            }
+        },
         "controller.TaskRequest": {
             "type": "object",
             "properties": {
@@ -241,6 +462,29 @@ const docTemplate = `{
                 }
             }
         },
+        "model.SmallTask": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "task_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Task": {
             "type": "object",
             "properties": {
@@ -255,6 +499,12 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "small_tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SmallTask"
+                    }
                 },
                 "title": {
                     "type": "string"

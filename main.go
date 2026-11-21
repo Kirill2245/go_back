@@ -27,11 +27,12 @@ func main() {
 	taskRepo := repository.NewTaskRepository(db)
 	taskSvc := service.NewTaskService(taskRepo)
 	taskController := controller.NewTaskController(taskSvc)
+	smallTaskController := controller.NewSmallTaskController(taskSvc)
 
 	e := echo.New()
 
 	e.Use(middleware.CORS(os.Getenv("ALLOWORIGIN")))
-	routes.Register(e, taskController)
+	routes.Register(e, taskController, smallTaskController)
 	if err := e.Start(":8080"); err != nil {
 		log.Fatal(err)
 	}

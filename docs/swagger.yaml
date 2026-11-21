@@ -12,6 +12,15 @@ definitions:
         example: task deleted
         type: string
     type: object
+  controller.SmallTaskRequest:
+    properties:
+      task_id:
+        example: 1
+        type: integer
+      title:
+        example: Buy milk
+        type: string
+    type: object
   controller.TaskRequest:
     properties:
       description:
@@ -29,6 +38,21 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  model.SmallTask:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      task_id:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   model.Task:
     properties:
       createdAt:
@@ -39,6 +63,10 @@ definitions:
         type: string
       id:
         type: integer
+      small_tasks:
+        items:
+          $ref: '#/definitions/model.SmallTask'
+        type: array
       title:
         type: string
       updatedAt:
@@ -51,6 +79,40 @@ info:
   title: BackToDo API
   version: "1.0"
 paths:
+  /create-small-task:
+    post:
+      consumes:
+      - application/json
+      description: Creates a small task with the given title for a task
+      parameters:
+      - description: Small task payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SmallTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.SmallTask'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Create a small task
+      tags:
+      - small-tasks
   /create-task:
     post:
       consumes:
@@ -81,6 +143,37 @@ paths:
       summary: Create a task
       tags:
       - tasks
+  /delete-small-task/{id}:
+    delete:
+      description: Deletes a small task by ID
+      parameters:
+      - description: Small task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Delete a small task
+      tags:
+      - small-tasks
   /delete-task/{id}:
     delete:
       description: Deletes a task by ID
@@ -112,6 +205,39 @@ paths:
       summary: Delete a task
       tags:
       - tasks
+  /get-small-tasks/{taskID}:
+    get:
+      description: Returns all small tasks of a task by task ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.SmallTask'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: List small tasks
+      tags:
+      - small-tasks
   /get-tasks:
     get:
       description: Returns all tasks
@@ -131,6 +257,45 @@ paths:
       summary: List tasks
       tags:
       - tasks
+  /update-small-task/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates the title of a small task by ID
+      parameters:
+      - description: Small task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Small task payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SmallTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SmallTask'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Update a small task
+      tags:
+      - small-tasks
   /update/{id}:
     patch:
       consumes:
