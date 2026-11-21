@@ -1,12 +1,12 @@
 services:
   app:
-    build: .
+    build: ./backend
     container_name: echo-app
     ports:
       - "8080:8080"
     working_dir: /app
     volumes:
-      - .:/app                      # Монтирование кода
+      - ./backend:/app              # Монтирование кода
       - go-mod-cache:/go/pkg/mod    # Кэш модулей
       - go-build-cache:/root/.cache/go-build # Кэш сборки
     environment:
